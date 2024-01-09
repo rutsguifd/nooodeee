@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
+    "task3": "nodemon csvscript.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,5 +13,8 @@
   "license": "ISC",
   "devDependencies": {
     "nodemon": "^3.0.2"
+  },
+  "dependencies": {
+    "csvtojson": "^2.0.10"
   }
 }
