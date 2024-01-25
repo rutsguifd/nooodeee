@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import UserRepository from "../repositories/user.repository";
-import User from "../models/user.model";
+import { User } from "../models/user.model";
 
 interface ExtendedRequest extends Request {
   user?: User;
@@ -17,9 +17,8 @@ const authenticationMiddleware = async (
     if (!userId) {
       res.status(401).json({ error: "Unauthorized - User ID not provided" });
     } else {
-      const UserRepo = new UserRepository();
-      const user = UserRepo.findById(userId);
-
+      const userRepository = new UserRepository();
+      const user = await userRepository.findById(userId);
       if (!user) {
         res.status(404).json({ error: "User not found" });
       } else {

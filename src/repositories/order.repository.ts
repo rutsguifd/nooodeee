@@ -1,19 +1,23 @@
-import Order from "../models/order.model";
-import orderDatabase from "../db/order.db";
+import OrderModel, { OrderDocument } from "../models/order.model";
 
-class OrderRepository {
-  findById: (id: string) => Order | undefined = (id: string) => {
-    return orderDatabase.find((order) => order.id === id);
-  };
+interface OrderRepositoryInterface {
+  findById(id: string): Promise<OrderDocument | null>;
+  findByUserId(userId: string): Promise<OrderDocument[]>;
+  create(order: OrderDocument): Promise<OrderDocument>;
+}
 
-  findByUserId: (userId: string) => Order[] = (userId: string) => {
-    return orderDatabase.filter((order) => order.userId === userId);
-  };
+class OrderRepository implements OrderRepositoryInterface {
+  async findById(id: string): Promise<OrderDocument | null> {
+    return OrderModel.findById(id).exec();
+  }
 
-  create: (order: Order) => Order = (order: Order) => {
-    orderDatabase.push(order);
-    return order;
-  };
+  async findByUserId(userId: string): Promise<OrderDocument[]> {
+    return OrderModel.find({ userId }).exec();
+  }
+
+  async create(order: OrderDocument): Promise<OrderDocument> {
+    return OrderModel.create(order);
+  }
 }
 
 export default OrderRepository;

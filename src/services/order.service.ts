@@ -1,5 +1,5 @@
+import { Order, OrderDocument } from "../models/order.model";
 import OrderRepository from "../repositories/order.repository";
-import Order from "../models/order.model";
 
 class OrderService {
   private orderRepository: OrderRepository;
@@ -8,17 +8,14 @@ class OrderService {
     this.orderRepository = new OrderRepository();
   }
 
-  getOrderById(id: string): Order | undefined {
-    return this.orderRepository.findById(id);
-  }
+  createOrder: (order: OrderDocument) => Promise<Order> = (order) =>
+    this.orderRepository.create(order);
 
-  getOrdersByUserId(userId: string): Order[] {
-    return this.orderRepository.findByUserId(userId);
-  }
+  getOrderById: (id: string) => Promise<OrderDocument | null> = (id) =>
+    this.orderRepository.findById(id);
 
-  createOrder(order: Order): Order {
-    return this.orderRepository.create(order);
-  }
+  getOrdersByUserId: (userId: string) => Promise<OrderDocument[]> = (userId) =>
+    this.orderRepository.findByUserId(userId);
 }
 
 export default OrderService;

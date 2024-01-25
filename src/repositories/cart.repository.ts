@@ -1,39 +1,34 @@
-import Cart from "../models/cart.model";
-import cartDatabase from "../db/cart.db";
+import CartModel, { CartDocument } from "../models/cart.model";
 
-class CartRepository {
-  findById: (id: string) => Cart | undefined = (id: string) => {
-    return cartDatabase.find((cart) => cart.id === id);
-  };
+interface CartRepositoryInterface {
+  findById(id: string): Promise<CartDocument | null>;
+  findByUserId(userId: string): Promise<CartDocument | null>;
+  create(cart: CartDocument): Promise<CartDocument>;
+  update(cart: CartDocument): Promise<CartDocument | null>;
+  delete(id: string): Promise<boolean>;
+}
 
-  findByUserId: (userId: string) => Cart | undefined = (userId: string) => {
-    return cartDatabase.find(
-      (cart) => cart.userId === userId && !cart.isDeleted
-    );
-  };
+class CartRepository implements CartRepositoryInterface {
+  async findById(id: string): Promise<CartDocument | null> {
+    return CartModel.findById(id).exec();
+  }
 
-  create: (cart: Cart) => Cart = (cart: Cart) => {
-    cartDatabase.push(cart);
-    return cart;
-  };
+  async findByUserId(userId: string): Promise<CartDocument | null> {
+    return CartModel.findOne({ userId }).exec();
+  }
 
-  update: (cart: Cart) => Cart | undefined = (cart: Cart) => {
-    const index = cartDatabase.findIndex((c) => c.id === cart.id);
-    if (index !== -1) {
-      cartDatabase[index] = cart;
-      return cart;
-    }
-    return undefined;
-  };
+  async create(cart: CartDocument): Promise<CartDocument> {
+    return CartModel.create(cart);
+  }
 
-  softDeleteCart: (id: string) => boolean = (id: string) => {
-    const cart = this.findById(id);
-    if (cart) {
-      cart.isDeleted = true;
-      return true;
-    }
-    return false;
-  };
+  async update(cart: CartDocument): Promise<CartDocument | null> {
+    return CartModel.findByIdAndUpdate(cart.id, cart, { new: true }).exec();
+  }
+
+  async delete(id: string): Promise<boolean> {
+    const result = await CartModel.findByIdAndDelete(id).exec();
+    return !!result;
+  }
 }
 
 export default CartRepository;

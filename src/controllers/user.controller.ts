@@ -8,53 +8,82 @@ class UserController {
     this.userService = new UserService();
   }
 
-  getUserById = (req: Request, res: Response): void => {
+  getUserById: (req: Request, res: Response) => Promise<void> = async (
+    req: Request,
+    res: Response
+  ) => {
     const userId = req.params.id;
-    const user = this.userService.getUserById(userId);
 
-    if (user) {
-      res.status(200).json(user);
-    } else {
-      res.status(404).json({ error: "User not found" });
+    try {
+      const user = await this.userService.getUserById(userId);
+
+      if (user) {
+        res.status(200).json(user);
+      } else {
+        res.status(404).json({ error: "User not found" });
+      }
+    } catch (error) {
+      console.error("Error getting user by ID:", error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
   };
 
-  createUser = (req: Request, res: Response): void => {
+  createUser: (req: Request, res: Response) => Promise<void> = async (
+    req: Request,
+    res: Response
+  ) => {
     const newUser = req.body;
 
-    const createdUser = this.userService.createUser(newUser);
-
-    res.status(201).json(createdUser);
+    try {
+      const createdUser = await this.userService.createUser(newUser);
+      res.status(201).json(createdUser);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
   };
 
-  updateUser = (req: Request, res: Response): void => {
+  updateUser: (req: Request, res: Response) => Promise<void> = async (
+    req: Request,
+    res: Response
+  ) => {
     const userId = req.params.id;
     const updatedUser = req.body;
 
-    const existingUser = this.userService.getUserById(userId);
-
-    if (existingUser) {
-      const result = this.userService.updateUser({
-        ...existingUser,
+    try {
+      const user = await this.userService.updateUser({
         ...updatedUser,
+        id: userId,
       });
-      if (result) {
-        res.status(200).json(result);
+
+      if (user) {
+        res.status(200).json(user);
       } else {
-        res.status(500).json({ error: "Failed to update user" });
+        res.status(404).json({ error: "User not found" });
       }
-    } else {
-      res.status(404).json({ error: "User not found" });
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
   };
 
-  softDeleteUser = (req: Request, res: Response): void => {
+  softDeleteUser: (req: Request, res: Response) => Promise<void> = async (
+    req: Request,
+    res: Response
+  ) => {
     const userId = req.params.id;
 
-    if (this.userService.softDeleteUser(userId)) {
-      res.status(200).json({ message: "User soft-deleted successfully" });
-    } else {
-      res.status(404).json({ error: "User not found" });
+    try {
+      const result = await this.userService.softDeleteUser(userId);
+
+      if (result) {
+        res.status(200).json({ message: "User soft-deleted successfully" });
+      } else {
+        res.status(404).json({ error: "User not found" });
+      }
+    } catch (error) {
+      console.error("Error soft-deleting user:", error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
   };
 }

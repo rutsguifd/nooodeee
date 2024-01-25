@@ -1,34 +1,44 @@
-import Product from "../models/product.model";
-import productDatabase from "../db/product.db";
+import ProductModel, {
+  Product,
+  ProductDocument,
+} from "../models/product.model";
 
 interface ProductRepositoryInterface {
-  findById: (id: string) => Product | undefined;
-  create: (product: Product) => Product;
-  update: (product: Product) => Product | undefined;
+  findById(id: string): Promise<ProductDocument | null>;
+  create(product: ProductDocument): Promise<ProductDocument>;
+  update(product: ProductDocument): Promise<ProductDocument | null>;
+  delete(id: string): Promise<boolean>;
 }
 
 class ProductRepository implements ProductRepositoryInterface {
-  findById: (id: string) => Product | undefined = (id: string) => {
-    console.log("id", id);
-    console.log(productDatabase);
+  async findById(id: string): Promise<ProductDocument | null> {
+    return ProductModel.findById(id).exec();
+  }
 
-    return productDatabase.find((product) => product.id === id);
-  };
+  async findAll(): Promise<Product[]> {
+    const products = await ProductModel.find().exec();
+    return products;
+  }
 
-  create: (product: Product) => Product = (product: Product) => {
-    productDatabase.push(product);
-    console.log(productDatabase);
-    return product;
-  };
+  async create(product: ProductDocument): Promise<ProductDocument> {
+    return ProductModel.create(product);
+  }
 
-  update: (product: Product) => Product | undefined = (product: Product) => {
-    const index = productDatabase.findIndex((p) => p.id === product.id);
-    if (index !== -1) {
-      productDatabase[index] = product;
-      return product;
-    }
-    return undefined;
-  };
+  async update(product: ProductDocument): Promise<ProductDocument | null> {
+    const updatedProduct = await ProductModel.findByIdAndUpdate(
+      product.id,
+      product,
+      {
+        new: true,
+      }
+    ).exec();
+    return updatedProduct;
+  }
+
+  async delete(id: string): Promise<boolean> {
+    const result = await ProductModel.findByIdAndDelete(id).exec();
+    return !!result;
+  }
 }
 
 export default ProductRepository;

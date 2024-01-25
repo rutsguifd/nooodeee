@@ -1,5 +1,5 @@
+import { Product, ProductDocument } from "../models/product.model";
 import ProductRepository from "../repositories/product.repository";
-import Product from "../models/product.model";
 
 class ProductService {
   private productRepository: ProductRepository;
@@ -8,17 +8,26 @@ class ProductService {
     this.productRepository = new ProductRepository();
   }
 
-  getProductById(id: string): Product | undefined {
-    return this.productRepository.findById(id);
-  }
+  getProductById = async (productId: string): Promise<Product | null> => {
+    return this.productRepository.findById(productId);
+  };
 
-  createProduct(product: Product): Product {
+  getAllProducts = async (): Promise<Product[]> => {
+    return this.productRepository.findAll();
+  };
+
+  createProduct = async (product: ProductDocument): Promise<Product> => {
     return this.productRepository.create(product);
-  }
+  };
 
-  updateProduct(product: Product): Product | undefined {
-    return this.productRepository.update(product);
-  }
+  updateProduct = async (product: ProductDocument): Promise<Product | null> => {
+    const updatedProduct = await this.productRepository.update(product);
+    return updatedProduct;
+  };
+
+  deleteProduct = async (productId: string): Promise<boolean> => {
+    return this.productRepository.delete(productId);
+  };
 }
 
 export default ProductService;

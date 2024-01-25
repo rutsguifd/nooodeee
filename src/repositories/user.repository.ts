@@ -1,39 +1,40 @@
-import User from "../models/user.model";
-import userDatabase from "../db/user.db";
+import UserModel, { UserDocument } from "../models/user.model";
 
-class UserRepository {
-  findById: (id: string) => User | undefined = (id: string) => {
-    return userDatabase.find((user) => user.id === id);
-  };
+interface UserRepositoryInterface {
+  findById(id: string): Promise<UserDocument | null>;
+  findByUsername(username: string): Promise<UserDocument | null>;
+  create(user: UserDocument): Promise<UserDocument>;
+  update(user: UserDocument): Promise<UserDocument | null>;
+  softDeleteUser(id: string): Promise<boolean>;
+}
 
-  findByUsername: (username: string) => User | undefined = (
-    username: string
-  ) => {
-    return userDatabase.find((user) => user.username === username);
-  };
+class UserRepository implements UserRepositoryInterface {
+  async findById(id: string): Promise<UserDocument | null> {
+    return UserModel.findById(id).exec();
+  }
 
-  create: (user: User) => User = (user: User) => {
-    userDatabase.push(user);
-    return user;
-  };
+  async findByUsername(username: string): Promise<UserDocument | null> {
+    return UserModel.findOne({ username, isDeleted: false }).exec();
+  }
 
-  update: (user: User) => User | undefined = (user: User) => {
-    const index = userDatabase.findIndex((u) => u.id === user.id);
-    if (index !== -1) {
-      userDatabase[index] = user;
-      return user;
-    }
-    return undefined;
-  };
+  async create(user: UserDocument): Promise<UserDocument> {
+    return UserModel.create(user);
+  }
 
-  softDeleteUser: (id: string) => boolean = (id: string) => {
-    const user = this.findById(id);
-    if (user) {
-      user.cartId = null;
-      return true;
-    }
-    return false;
-  };
+  async update(user: UserDocument): Promise<UserDocument | null> {
+    return UserModel.findByIdAndUpdate(user._id.toString(), user, {
+      new: true,
+    }).exec();
+  }
+
+  async softDeleteUser(id: string): Promise<boolean> {
+    const result = await UserModel.findByIdAndUpdate(
+      id,
+      { isDeleted: true },
+      { new: true }
+    ).exec();
+    return !!result;
+  }
 }
 
 export default UserRepository;

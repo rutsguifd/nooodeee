@@ -1,32 +1,40 @@
+import { CartDocument } from "../models/cart.model";
 import CartRepository from "../repositories/cart.repository";
-import Cart from "../models/cart.model";
+import UserService from "./user.service";
 
 class CartService {
   private cartRepository: CartRepository;
+  private userService: UserService;
 
   constructor() {
     this.cartRepository = new CartRepository();
+    this.userService = new UserService();
   }
 
-  getCartById(id: string): Cart | undefined {
+  async createCart(cart: CartDocument): Promise<string> {
+    const createdCart = await this.cartRepository.create(cart);
+    return createdCart._id.toString();
+  }
+
+  getCartById: (id: string) => Promise<CartDocument | null> = (id: string) => {
     return this.cartRepository.findById(id);
-  }
+  };
 
-  getUserActiveCart(userId: string): Cart | undefined {
-    return this.cartRepository.findByUserId(userId);
-  }
-
-  createCart(cart: Cart): Cart {
-    return this.cartRepository.create(cart);
-  }
-
-  updateCart(cart: Cart): Cart | undefined {
+  updateCart: (cart: CartDocument) => Promise<CartDocument | null> = (
+    cart: CartDocument
+  ) => {
     return this.cartRepository.update(cart);
-  }
+  };
 
-  softDeleteCart(id: string): boolean {
-    return this.cartRepository.softDeleteCart(id);
-  }
+  DeleteCart: (id: string) => Promise<boolean> = (id: string) => {
+    return this.cartRepository.delete(id);
+  };
+
+  getActiveCartByUserId: (userId: string) => Promise<CartDocument | null> = (
+    userId: string
+  ) => {
+    return this.cartRepository.findByUserId(userId);
+  };
 }
 
 export default CartService;
