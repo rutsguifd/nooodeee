@@ -1,10 +1,14 @@
+"use strict";
 /**
  * @swagger
  * tags:
  *   name: Cart
  *   description: Cart management
  */
-
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @swagger
  * /api/user/cart/{cartId}:
@@ -28,7 +32,6 @@
  *       500:
  *         description: Internal Server Error
  */
-
 /**
  * @swagger
  * /api/user/cart:
@@ -50,7 +53,6 @@
  *       500:
  *         description: Internal Server Error
  */
-
 /**
  * @swagger
  * /api/user/cart/update:
@@ -74,7 +76,6 @@
  *       500:
  *         description: Internal Server Error
  */
-
 /**
  * @swagger
  * /api/user/cart/delete:
@@ -91,7 +92,6 @@
  *       500:
  *         description: Internal Server Error
  */
-
 /**
 
 /**
@@ -136,37 +136,13 @@
  *       - $ref: '#/definitions/CartInput'
  *       - $ref: '#/definitions/CartOutput'
  */
-
-import express from "express";
-import CartController from "../controllers/cart.controller";
-import {
-  authenticationMiddleware,
-  adminAuthorizationMiddleware,
-} from "../middleware/authentication.middleware";
-
-const router = express.Router();
-const cartController = new CartController();
-
-router.get(
-  "/api/user/cart/:cartId",
-  authenticationMiddleware,
-  cartController.getCartById
-);
-router.post(
-  "/api/user/cart",
-  authenticationMiddleware,
-  cartController.createCart
-);
-router.put(
-  "/api/user/cart/update",
-  authenticationMiddleware,
-  cartController.updateCart
-);
-router.delete(
-  "/api/user/cart/delete",
-  authenticationMiddleware,
-  adminAuthorizationMiddleware,
-  cartController.DeleteCart
-);
-
-export default router;
+const express_1 = __importDefault(require("express"));
+const cart_controller_1 = __importDefault(require("../controllers/cart.controller"));
+const authentication_middleware_1 = require("../middleware/authentication.middleware");
+const router = express_1.default.Router();
+const cartController = new cart_controller_1.default();
+router.get("/api/user/cart/:cartId", authentication_middleware_1.authenticationMiddleware, cartController.getCartById);
+router.post("/api/user/cart", authentication_middleware_1.authenticationMiddleware, cartController.createCart);
+router.put("/api/user/cart/update", authentication_middleware_1.authenticationMiddleware, cartController.updateCart);
+router.delete("/api/user/cart/delete", authentication_middleware_1.authenticationMiddleware, authentication_middleware_1.adminAuthorizationMiddleware, cartController.DeleteCart);
+exports.default = router;

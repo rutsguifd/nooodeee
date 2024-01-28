@@ -1,10 +1,14 @@
+"use strict";
 /**
  * @swagger
  * tags:
  *   name: Users
  *   description: User management
  */
-
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @swagger
  * /api/users/{id}:
@@ -28,7 +32,6 @@
  *       500:
  *         description: Internal Server Error
  */
-
 /**
  * @swagger
  * /api/users:
@@ -48,7 +51,6 @@
  *       500:
  *         description: Internal Server Error
  */
-
 /**
  * @swagger
  * /api/users/{id}:
@@ -79,7 +81,6 @@
  *       500:
  *         description: Internal Server Error
  */
-
 /**
  * @swagger
  * /api/users/{id}:
@@ -103,7 +104,6 @@
  *       500:
  *         description: Internal Server Error
  */
-
 /**
  * @swagger
  * /api/register:
@@ -129,7 +129,6 @@
  *       500:
  *         description: Internal Server Error
  */
-
 /**
  * @swagger
  * /api/login:
@@ -164,32 +163,15 @@
  *       500:
  *         description: Internal Server Error
  */
-
-import express from "express";
-import UserController from "../controllers/user.controller";
-import { authenticationMiddleware } from "../middleware/authentication.middleware";
-
-const router = express.Router();
-const userController = new UserController();
-
-router.get(
-  "/api/users/:id",
-  authenticationMiddleware,
-  userController.getUserById
-);
+const express_1 = __importDefault(require("express"));
+const user_controller_1 = __importDefault(require("../controllers/user.controller"));
+const authentication_middleware_1 = require("../middleware/authentication.middleware");
+const router = express_1.default.Router();
+const userController = new user_controller_1.default();
+router.get("/api/users/:id", authentication_middleware_1.authenticationMiddleware, userController.getUserById);
 router.post("/api/users", userController.createUser);
-router.put(
-  "/api/users/:id",
-  authenticationMiddleware,
-  userController.updateUser
-);
-router.delete(
-  "/api/users/:id",
-  authenticationMiddleware,
-
-  userController.softDeleteUser
-);
+router.put("/api/users/:id", authentication_middleware_1.authenticationMiddleware, userController.updateUser);
+router.delete("/api/users/:id", authentication_middleware_1.authenticationMiddleware, userController.softDeleteUser);
 router.post("/register", userController.register);
 router.post("/login", userController.login);
-
-export default router;
+exports.default = router;

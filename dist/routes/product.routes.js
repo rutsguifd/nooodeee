@@ -1,10 +1,14 @@
+"use strict";
 /**
  * @swagger
  * tags:
  *   name: Products
  *   description: Product management
  */
-
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @swagger
  * /api/products/{id}:
@@ -26,7 +30,6 @@
  *       500:
  *         description: Internal Server Error
  */
-
 /**
  * @swagger
  * /api/products:
@@ -39,7 +42,6 @@
  *       500:
  *         description: Internal Server Error
  */
-
 /**
  * @swagger
  * /api/products:
@@ -59,7 +61,6 @@
  *       500:
  *         description: Internal Server Error
  */
-
 /**
  * @swagger
  * /api/products/{id}:
@@ -88,7 +89,6 @@
  *       500:
  *         description: Internal Server Error
  */
-
 /**
  * @swagger
  * /api/products/{id}:
@@ -110,7 +110,6 @@
  *       500:
  *         description: Internal Server Error
  */
-
 /**
 /**
  * @swagger
@@ -144,44 +143,14 @@
  *       - $ref: '#/definitions/ProductInput'
  *       - $ref: '#/definitions/ProductOutput'
  */
-
-import express from "express";
-import ProductController from "../controllers/product.controller";
-import {
-  authenticationMiddleware,
-  adminAuthorizationMiddleware,
-} from "../middleware/authentication.middleware";
-
-const router = express.Router();
-const productController = new ProductController();
-
-router.get(
-  "/api/products/:id",
-  authenticationMiddleware,
-  productController.getProductById
-);
-router.get(
-  "/api/products",
-  authenticationMiddleware,
-  productController.getAllProducts
-);
-router.post(
-  "/api/products",
-  authenticationMiddleware,
-  adminAuthorizationMiddleware,
-  productController.createProduct
-);
-router.put(
-  "/api/products/:id",
-  authenticationMiddleware,
-  adminAuthorizationMiddleware,
-  productController.updateProduct
-);
-router.delete(
-  "/api/products/:id",
-  authenticationMiddleware,
-  adminAuthorizationMiddleware,
-  productController.deleteProduct
-);
-
-export default router;
+const express_1 = __importDefault(require("express"));
+const product_controller_1 = __importDefault(require("../controllers/product.controller"));
+const authentication_middleware_1 = require("../middleware/authentication.middleware");
+const router = express_1.default.Router();
+const productController = new product_controller_1.default();
+router.get("/api/products/:id", authentication_middleware_1.authenticationMiddleware, productController.getProductById);
+router.get("/api/products", authentication_middleware_1.authenticationMiddleware, productController.getAllProducts);
+router.post("/api/products", authentication_middleware_1.authenticationMiddleware, authentication_middleware_1.adminAuthorizationMiddleware, productController.createProduct);
+router.put("/api/products/:id", authentication_middleware_1.authenticationMiddleware, authentication_middleware_1.adminAuthorizationMiddleware, productController.updateProduct);
+router.delete("/api/products/:id", authentication_middleware_1.authenticationMiddleware, authentication_middleware_1.adminAuthorizationMiddleware, productController.deleteProduct);
+exports.default = router;

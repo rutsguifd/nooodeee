@@ -8,6 +8,32 @@ class UserController {
     this.userService = new UserService();
   }
 
+  async register(req: Request, res: Response): Promise<void> {
+    const { email, password } = req.body;
+    try {
+      const token = await this.userService.registerUser(email, password);
+      res.status(201).json({ token });
+    } catch (error) {
+      console.error("Error registering user:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+
+  async login(req: Request, res: Response): Promise<void> {
+    const { email, password } = req.body;
+    try {
+      const token = await this.userService.loginUser(email, password);
+      if (!token) {
+        res.status(401).json({ error: "Unauthorized: Invalid credentials" });
+        return;
+      }
+      res.json({ token });
+    } catch (error) {
+      console.error("Error logging in:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  }
+
   getUserById: (req: Request, res: Response) => Promise<void> = async (
     req: Request,
     res: Response

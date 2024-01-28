@@ -1,8 +1,8 @@
-import UserModel, { UserDocument } from "../models/user.model";
+import UserModel, { User, UserDocument } from "../models/user.model";
 
 interface UserRepositoryInterface {
   findById(id: string): Promise<UserDocument | null>;
-  findByUsername(username: string): Promise<UserDocument | null>;
+  findByEmail(email: string): Promise<UserDocument | null>;
   create(user: UserDocument): Promise<UserDocument>;
   update(user: UserDocument): Promise<UserDocument | null>;
   softDeleteUser(id: string): Promise<boolean>;
@@ -13,8 +13,12 @@ class UserRepository implements UserRepositoryInterface {
     return UserModel.findById(id).exec();
   }
 
-  async findByUsername(username: string): Promise<UserDocument | null> {
-    return UserModel.findOne({ username, isDeleted: false }).exec();
+  findByEmail(email: string): Promise<UserDocument | null> {
+    return UserModel.findOne({ email });
+  }
+
+  createUser(user: User): Promise<UserDocument> {
+    return UserModel.create(user);
   }
 
   async create(user: UserDocument): Promise<UserDocument> {

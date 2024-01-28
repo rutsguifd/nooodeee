@@ -1,10 +1,14 @@
+"use strict";
 /**
  * @swagger
  * tags:
  *   name: Order
  *   description: Order management
  */
-
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * @swagger
  * /api/orders/{id}:
@@ -28,7 +32,6 @@
  *       500:
  *         description: Internal Server Error
  */
-
 /**
  * @swagger
  * /api/orders/user/{userId}:
@@ -52,7 +55,6 @@
  *       500:
  *         description: Internal Server Error
  */
-
 /**
  * @swagger
  * /api/orders:
@@ -74,7 +76,6 @@
  *       500:
  *         description: Internal Server Error
  */
-
 /**
 /**
  * @swagger
@@ -124,28 +125,12 @@
  *       - userId
  *       - items
  */
-
-import express from "express";
-import OrderController from "../controllers/order.controller";
-import { authenticationMiddleware } from "../middleware/authentication.middleware";
-
-const router = express.Router();
-const orderController = new OrderController();
-
-router.get(
-  "/api/orders/:id",
-  authenticationMiddleware,
-  orderController.getOrderById
-);
-router.get(
-  "/api/orders/user/:userId",
-  authenticationMiddleware,
-  orderController.getOrdersByUserId
-);
-router.post(
-  "/api/orders",
-  authenticationMiddleware,
-  orderController.createOrder
-);
-
-export default router;
+const express_1 = __importDefault(require("express"));
+const order_controller_1 = __importDefault(require("../controllers/order.controller"));
+const authentication_middleware_1 = require("../middleware/authentication.middleware");
+const router = express_1.default.Router();
+const orderController = new order_controller_1.default();
+router.get("/api/orders/:id", authentication_middleware_1.authenticationMiddleware, orderController.getOrderById);
+router.get("/api/orders/user/:userId", authentication_middleware_1.authenticationMiddleware, orderController.getOrdersByUserId);
+router.post("/api/orders", authentication_middleware_1.authenticationMiddleware, orderController.createOrder);
+exports.default = router;

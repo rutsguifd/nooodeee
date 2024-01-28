@@ -1,17 +1,26 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Schema } from "mongoose";
 
 export interface User {
-  username: string;
+  _id: string;
   email: string;
+  password: string;
+  role: "user" | "admin";
   cartId: string | null;
-  isDeleted: { type: Boolean; default: false };
 }
 
-export interface UserDocument extends User, Document {}
+export interface UserDocument extends Document {
+  _id: string;
+  email: string;
+  password: string;
+  role: "user" | "admin";
+  cartId: string | null;
+}
 
-const UserSchema = new mongoose.Schema<UserDocument>({
-  username: { type: String, required: true },
-  email: { type: String, required: true },
+const UserSchema: Schema<UserDocument> = new mongoose.Schema({
+  _id: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: { type: String, enum: ["user", "admin"], default: "user" },
   cartId: { type: String, default: null },
 });
 

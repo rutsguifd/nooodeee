@@ -1,35 +1,62 @@
 import { Request, Response, NextFunction } from "express";
-import UserRepository from "../repositories/user.repository";
-import { User } from "../models/user.model";
+import jwt from "jsonwebtoken";
 
-interface ExtendedRequest extends Request {
-  user?: User;
+const JWT_SECRET = "your-secret-key";
+
+// Define the shape of the decoded token
+interface DecodedToken {
+  userId: string;
+  email: string;
+  role: string;
 }
 
-const authenticationMiddleware = async (
-  req: ExtendedRequest,
+// Extend the Request interface to include a user property
+declare global {
+  namespace Express {
+    interface Request {
+      user?: DecodedToken;
+    }
+  }
+}
+
+const authenticationMiddleware = (
+  req: Request,
   res: Response,
   next: NextFunction
-): Promise<void> => {
-  const userId = req.headers["x-user-id"] as string;
+): void => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) {
+    res.status(401).json({ error: "Unauthorized: Missing token" });
+    return;
+  }
 
   try {
-    if (!userId) {
-      res.status(401).json({ error: "Unauthorized - User ID not provided" });
-    } else {
-      const userRepository = new UserRepository();
-      const user = await userRepository.findById(userId);
-      if (!user) {
-        res.status(404).json({ error: "User not found" });
-      } else {
-        req.user = user;
-        next();
-      }
-    }
+    const decodedToken = jwt.verify(token, JWT_SECRET) as {
+      userId: string;
+      email: string;
+      role: string;
+    };
+    req.user = decodedToken;
+    next();
   } catch (error) {
-    console.error("Error in authentication middleware:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error("Error verifying token:", error);
+    res.status(401).json({ error: "Unauthorized: Invalid token" });
   }
 };
 
-export default authenticationMiddleware;
+const adminAuthorizationMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  const userRole = req.user?.role;
+  if (userRole !== "admin") {
+    res.status(403).json({
+      error: "Forbidden: Only admin users are allowed to perform this action",
+    });
+    return;
+  }
+  next();
+};
+
+export { authenticationMiddleware, adminAuthorizationMiddleware };
