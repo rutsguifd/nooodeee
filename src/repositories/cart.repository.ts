@@ -4,8 +4,8 @@ interface CartRepositoryInterface {
   findById(id: string): Promise<CartDocument | null>;
   findByUserId(userId: string): Promise<CartDocument | null>;
   create(cart: CartDocument): Promise<CartDocument>;
-  update(cart: CartDocument): Promise<CartDocument | null>;
-  delete(id: string): Promise<boolean>;
+  update(cartId: string, cart: CartDocument): Promise<CartDocument | null>;
+  softDelete(id: string): Promise<boolean>;
 }
 
 class CartRepository implements CartRepositoryInterface {
@@ -21,12 +21,19 @@ class CartRepository implements CartRepositoryInterface {
     return CartModel.create(cart);
   }
 
-  async update(cart: CartDocument): Promise<CartDocument | null> {
-    return CartModel.findByIdAndUpdate(cart.id, cart, { new: true }).exec();
+  async update(
+    cartId: string,
+    updatedCart: Partial<CartDocument>
+  ): Promise<CartDocument | null> {
+    return CartModel.findByIdAndUpdate(cartId, updatedCart, {
+      new: true,
+    }).exec();
   }
 
-  async delete(id: string): Promise<boolean> {
-    const result = await CartModel.findByIdAndDelete(id).exec();
+  async softDelete(id: string): Promise<boolean> {
+    const result = await CartModel.findByIdAndUpdate(id, {
+      isDeleted: true,
+    }).exec();
     return !!result;
   }
 }

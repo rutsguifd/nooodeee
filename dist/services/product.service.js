@@ -24,9 +24,13 @@ class ProductService {
         this.createProduct = (product) => __awaiter(this, void 0, void 0, function* () {
             return this.productRepository.create(product);
         });
-        this.updateProduct = (product) => __awaiter(this, void 0, void 0, function* () {
-            const updatedProduct = yield this.productRepository.update(product);
-            return updatedProduct;
+        this.updateProduct = (productId, updatedProductData) => __awaiter(this, void 0, void 0, function* () {
+            const existingProduct = yield this.productRepository.findById(productId);
+            if (!existingProduct) {
+                return null;
+            }
+            const updatedProduct = Object.assign(Object.assign({}, existingProduct.toObject()), updatedProductData);
+            return this.productRepository.update(updatedProduct);
         });
         this.deleteProduct = (productId) => __awaiter(this, void 0, void 0, function* () {
             return this.productRepository.delete(productId);

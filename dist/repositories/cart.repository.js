@@ -29,14 +29,18 @@ class CartRepository {
             return cart_model_1.default.create(cart);
         });
     }
-    update(cart) {
+    update(cartId, updatedCart) {
         return __awaiter(this, void 0, void 0, function* () {
-            return cart_model_1.default.findByIdAndUpdate(cart.id, cart, { new: true }).exec();
+            return cart_model_1.default.findByIdAndUpdate(cartId, updatedCart, {
+                new: true,
+            }).exec();
         });
     }
-    delete(id) {
+    softDelete(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield cart_model_1.default.findByIdAndDelete(id).exec();
+            const result = yield cart_model_1.default.findByIdAndUpdate(id, {
+                isDeleted: true,
+            }).exec();
             return !!result;
         });
     }

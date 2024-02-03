@@ -42,70 +42,23 @@ class UserController {
                 res.status(500).json({ error: "Internal Server Error" });
             }
         });
-        this.updateUser = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const userId = req.params.id;
-            const updatedUser = req.body;
-            try {
-                const user = yield this.userService.updateUser(Object.assign(Object.assign({}, updatedUser), { id: userId }));
-                if (user) {
-                    res.status(200).json(user);
-                }
-                else {
-                    res.status(404).json({ error: "User not found" });
-                }
-            }
-            catch (error) {
-                console.error("Error updating user:", error);
-                res.status(500).json({ error: "Internal Server Error" });
-            }
-        });
         this.softDeleteUser = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const userId = req.params.id;
             try {
-                const result = yield this.userService.softDeleteUser(userId);
+                const result = yield this.userService.deleteUser(userId);
                 if (result) {
-                    res.status(200).json({ message: "User soft-deleted successfully" });
+                    res.status(200).json({ message: "User deleted successfully" });
                 }
                 else {
                     res.status(404).json({ error: "User not found" });
                 }
             }
             catch (error) {
-                console.error("Error soft-deleting user:", error);
+                console.error("Error deleting user:", error);
                 res.status(500).json({ error: "Internal Server Error" });
             }
         });
         this.userService = new user_service_1.default();
-    }
-    register(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { email, password } = req.body;
-            try {
-                const token = yield this.userService.registerUser(email, password);
-                res.status(201).json({ token });
-            }
-            catch (error) {
-                console.error("Error registering user:", error);
-                res.status(500).json({ error: "Internal Server Error" });
-            }
-        });
-    }
-    login(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { email, password } = req.body;
-            try {
-                const token = yield this.userService.loginUser(email, password);
-                if (!token) {
-                    res.status(401).json({ error: "Unauthorized: Invalid credentials" });
-                    return;
-                }
-                res.json({ token });
-            }
-            catch (error) {
-                console.error("Error logging in:", error);
-                res.status(500).json({ error: "Internal Server Error" });
-            }
-        });
     }
 }
 exports.default = UserController;

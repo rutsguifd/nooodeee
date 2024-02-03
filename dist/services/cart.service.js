@@ -13,28 +13,42 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const cart_repository_1 = __importDefault(require("../repositories/cart.repository"));
-const user_service_1 = __importDefault(require("./user.service"));
 class CartService {
     constructor() {
         this.getCartById = (id) => {
             return this.cartRepository.findById(id);
         };
-        this.updateCart = (cart) => {
-            return this.cartRepository.update(cart);
+        this.updateCart = (cartId, updatedCart) => {
+            return this.cartRepository.update(cartId, updatedCart);
         };
-        this.DeleteCart = (id) => {
-            return this.cartRepository.delete(id);
+        this.deleteCart = (id) => {
+            return this.cartRepository.softDelete(id);
         };
         this.getActiveCartByUserId = (userId) => {
             return this.cartRepository.findByUserId(userId);
         };
         this.cartRepository = new cart_repository_1.default();
-        this.userService = new user_service_1.default();
     }
     createCart(cart) {
         return __awaiter(this, void 0, void 0, function* () {
             const createdCart = yield this.cartRepository.create(cart);
             return createdCart._id.toString();
+        });
+    }
+    deleteActiveCartByUserId(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const existingCart = yield this.getActiveCartByUserId(userId);
+                if (existingCart) {
+                    yield this.cartRepository.softDelete(existingCart.id);
+                    return true;
+                }
+                return false;
+            }
+            catch (error) {
+                console.error("Error deleting active cart:", error);
+                throw error;
+            }
         });
     }
 }

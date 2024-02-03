@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const cart_service_1 = __importDefault(require("../services/cart.service"));
-const user_service_1 = __importDefault(require("../services/user.service"));
 class CartController {
     constructor() {
         this.getCartById = (req, res) => __awaiter(this, void 0, void 0, function* () {
@@ -33,19 +32,16 @@ class CartController {
             }
         });
         this.createCart = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            const newCart = req.body;
-            const userId = newCart.userId;
+            const newCartData = req.body;
             try {
-                const existingCart = yield this.cartService.getActiveCartByUserId(userId);
-                if (existingCart) {
-                    res.status(200).json(existingCart);
+                const userId = newCartData.userId;
+                if (!userId) {
+                    res.status(400).json({ error: "userId is required" });
+                    return;
                 }
-                else {
-                    const createdCartId = yield this.cartService.createCart(newCart);
-                    const updateUser = yield this.userService.getUserById(userId);
-                    yield this.userService.updateUser(updateUser, createdCartId);
-                    res.status(201).json({ cartId: createdCartId });
-                }
+                yield this.cartService.deleteActiveCartByUserId(userId);
+                const createdCartId = yield this.cartService.createCart(newCartData);
+                res.status(201).json({ cartId: createdCartId });
             }
             catch (error) {
                 console.error("Error creating cart:", error);
@@ -54,11 +50,11 @@ class CartController {
         });
         this.updateCart = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const cartId = req.params.id;
-            const updatedCart = req.body;
+            const updatedCartData = req.body;
             try {
-                const cart = yield this.cartService.updateCart(Object.assign(Object.assign({}, updatedCart), { id: cartId }));
-                if (cart) {
-                    res.status(200).json(cart);
+                const updatedCart = yield this.cartService.updateCart(cartId, updatedCartData);
+                if (updatedCart) {
+                    res.status(200).json(updatedCart);
                 }
                 else {
                     res.status(404).json({ error: "Cart not found" });
@@ -69,10 +65,10 @@ class CartController {
                 res.status(500).json({ error: "Internal Server Error" });
             }
         });
-        this.DeleteCart = (req, res) => __awaiter(this, void 0, void 0, function* () {
+        this.deleteCart = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const cartId = req.params.id;
             try {
-                const result = yield this.cartService.DeleteCart(cartId);
+                const result = yield this.cartService.deleteCart(cartId);
                 if (result) {
                     res.status(200).json({ message: "Cart soft-deleted successfully" });
                 }
@@ -85,8 +81,23 @@ class CartController {
                 res.status(500).json({ error: "Internal Server Error" });
             }
         });
+        this.getActiveCartByUserId = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const userId = req.params.userId;
+            try {
+                const cart = yield this.cartService.getActiveCartByUserId(userId);
+                if (cart) {
+                    res.status(200).json(cart);
+                }
+                else {
+                    res.status(404).json({ error: "Cart not found" });
+                }
+            }
+            catch (error) {
+                console.error("Error getting active cart by user ID:", error);
+                res.status(500).json({ error: "Internal Server Error" });
+            }
+        });
         this.cartService = new cart_service_1.default();
-        this.userService = new user_service_1.default();
     }
 }
 exports.default = CartController;

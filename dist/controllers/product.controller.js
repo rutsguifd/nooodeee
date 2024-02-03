@@ -66,25 +66,18 @@ class ProductController {
         this.updateProduct = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const productId = req.params.id;
             const updatedProductData = req.body;
-            const existingProduct = yield this.productService.getProductById(productId);
-            if (existingProduct) {
-                const updatedData = {
-                    name: updatedProductData.name || existingProduct.name,
-                    price: updatedProductData.price || existingProduct.price,
-                    description: updatedProductData.description || existingProduct.description,
-                    id: productId,
-                };
-                const updatedProduct = yield this.productService.updateProduct(updatedData);
+            try {
+                const updatedProduct = yield this.productService.updateProduct(productId, updatedProductData);
                 if (updatedProduct) {
-                    console.log(updatedProduct);
                     res.status(200).json(updatedProduct);
                 }
                 else {
                     res.status(500).json({ error: "Failed to update product" });
                 }
             }
-            else {
-                res.status(404).json({ error: "Product not found" });
+            catch (error) {
+                console.error("Error updating product:", error);
+                res.status(500).json({ error: "Internal Server Error" });
             }
         });
         this.productService = new product_service_1.default();

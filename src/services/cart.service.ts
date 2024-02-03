@@ -1,14 +1,11 @@
 import { CartDocument } from "../models/cart.model";
 import CartRepository from "../repositories/cart.repository";
-import UserService from "./user.service";
 
 class CartService {
   private cartRepository: CartRepository;
-  private userService: UserService;
 
   constructor() {
     this.cartRepository = new CartRepository();
-    this.userService = new UserService();
   }
 
   async createCart(cart: CartDocument): Promise<string> {
@@ -20,15 +17,35 @@ class CartService {
     return this.cartRepository.findById(id);
   };
 
-  updateCart: (cart: CartDocument) => Promise<CartDocument | null> = (
-    cart: CartDocument
+  updateCart: (
+    cartId: string,
+    updatedCart: Partial<CartDocument>
+  ) => Promise<CartDocument | null> = (
+    cartId: string,
+    updatedCart: Partial<CartDocument>
   ) => {
-    return this.cartRepository.update(cart);
+    return this.cartRepository.update(cartId, updatedCart);
   };
 
-  DeleteCart: (id: string) => Promise<boolean> = (id: string) => {
-    return this.cartRepository.delete(id);
+  deleteCart: (id: string) => Promise<boolean> = (id: string) => {
+    return this.cartRepository.softDelete(id);
   };
+
+  async deleteActiveCartByUserId(userId: string): Promise<boolean> {
+    try {
+      const existingCart = await this.getActiveCartByUserId(userId);
+
+      if (existingCart) {
+        await this.cartRepository.softDelete(existingCart.id);
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error("Error deleting active cart:", error);
+      throw error;
+    }
+  }
 
   getActiveCartByUserId: (userId: string) => Promise<CartDocument | null> = (
     userId: string

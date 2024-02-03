@@ -1,22 +1,15 @@
 import { Request, Response } from "express";
-import { CartDocument } from "../models/cart.model";
-import { UserDocument } from "../models/user.model";
 import CartService from "../services/cart.service";
-import UserService from "../services/user.service";
+import { CartDocument } from "../models/cart.model";
 
 class CartController {
   private cartService: CartService;
-  private userService: UserService;
 
   constructor() {
     this.cartService = new CartService();
-    this.userService = new UserService();
   }
 
-  getCartById: (req: Request, res: Response) => Promise<void> = async (
-    req: Request,
-    res: Response
-  ) => {
+  getCartById = async (req: Request, res: Response): Promise<void> => {
     const cartId = req.params.id;
 
     try {
@@ -33,52 +26,40 @@ class CartController {
     }
   };
 
-  createCart: (req: Request, res: Response) => Promise<void> = async (
-    req: Request,
-    res: Response
-  ) => {
-    const newCart = req.body;
-    const userId = newCart.userId;
+  createCart = async (req: Request, res: Response): Promise<void> => {
+    const newCartData: Partial<CartDocument> = req.body;
 
     try {
-      const existingCart = await this.cartService.getActiveCartByUserId(userId);
-
-      if (existingCart) {
-        res.status(200).json(existingCart);
-      } else {
-        const createdCartId = await this.cartService.createCart(
-          newCart as CartDocument
-        );
-
-        const updateUser = await this.userService.getUserById(userId);
-        await this.userService.updateUser(
-          updateUser as UserDocument,
-          createdCartId
-        );
-
-        res.status(201).json({ cartId: createdCartId });
+      const userId = newCartData.userId;
+      if (!userId) {
+        res.status(400).json({ error: "userId is required" });
+        return;
       }
+
+      await this.cartService.deleteActiveCartByUserId(userId);
+
+      const createdCartId = await this.cartService.createCart(
+        newCartData as CartDocument
+      );
+      res.status(201).json({ cartId: createdCartId });
     } catch (error) {
       console.error("Error creating cart:", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
   };
 
-  updateCart: (req: Request, res: Response) => Promise<void> = async (
-    req: Request,
-    res: Response
-  ) => {
+  updateCart = async (req: Request, res: Response): Promise<void> => {
     const cartId = req.params.id;
-    const updatedCart = req.body;
+    const updatedCartData: Partial<CartDocument> = req.body;
 
     try {
-      const cart = await this.cartService.updateCart({
-        ...updatedCart,
-        id: cartId,
-      });
+      const updatedCart = await this.cartService.updateCart(
+        cartId,
+        updatedCartData
+      );
 
-      if (cart) {
-        res.status(200).json(cart);
+      if (updatedCart) {
+        res.status(200).json(updatedCart);
       } else {
         res.status(404).json({ error: "Cart not found" });
       }
@@ -88,14 +69,11 @@ class CartController {
     }
   };
 
-  DeleteCart: (req: Request, res: Response) => Promise<void> = async (
-    req: Request,
-    res: Response
-  ) => {
+  deleteCart = async (req: Request, res: Response): Promise<void> => {
     const cartId = req.params.id;
 
     try {
-      const result = await this.cartService.DeleteCart(cartId);
+      const result = await this.cartService.deleteCart(cartId);
 
       if (result) {
         res.status(200).json({ message: "Cart soft-deleted successfully" });
@@ -104,6 +82,26 @@ class CartController {
       }
     } catch (error) {
       console.error("Error soft-deleting cart:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  };
+
+  getActiveCartByUserId = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
+    const userId = req.params.userId;
+
+    try {
+      const cart = await this.cartService.getActiveCartByUserId(userId);
+
+      if (cart) {
+        res.status(200).json(cart);
+      } else {
+        res.status(404).json({ error: "Cart not found" });
+      }
+    } catch (error) {
+      console.error("Error getting active cart by user ID:", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
   };

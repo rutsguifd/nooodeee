@@ -19,27 +19,19 @@ class UserRepository {
             return user_model_1.default.findById(id).exec();
         });
     }
-    findByEmail(email) {
-        return user_model_1.default.findOne({ email });
-    }
-    createUser(user) {
-        return user_model_1.default.create(user);
+    findByUsername(username) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return user_model_1.default.findOne({ username }).exec();
+        });
     }
     create(user) {
         return __awaiter(this, void 0, void 0, function* () {
             return user_model_1.default.create(user);
         });
     }
-    update(user) {
+    deleteUser(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return user_model_1.default.findByIdAndUpdate(user._id.toString(), user, {
-                new: true,
-            }).exec();
-        });
-    }
-    softDeleteUser(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const result = yield user_model_1.default.findByIdAndUpdate(id, { isDeleted: true }, { new: true }).exec();
+            const result = yield user_model_1.default.findByIdAndDelete(id).exec();
             return !!result;
         });
     }

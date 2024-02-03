@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { Product, ProductDocument } from "../models/product.model";
 import ProductService from "../services/product.service";
+import { ProductDocument } from "../models/product.model";
 
 class ProductController {
   private productService: ProductService;
@@ -37,7 +37,7 @@ class ProductController {
   };
 
   createProduct = async (req: Request, res: Response): Promise<void> => {
-    const newProduct = req.body;
+    const newProduct = req.body as ProductDocument;
 
     try {
       const createdProduct = await this.productService.createProduct(
@@ -64,31 +64,22 @@ class ProductController {
 
   updateProduct = async (req: Request, res: Response): Promise<void> => {
     const productId = req.params.id;
-    const updatedProductData: Product = req.body;
+    const updatedProductData: ProductDocument = req.body;
 
-    const existingProduct = await this.productService.getProductById(productId);
-
-    if (existingProduct) {
-      const updatedData = {
-        name: updatedProductData.name || existingProduct.name,
-        price: updatedProductData.price || existingProduct.price,
-        description:
-          updatedProductData.description || existingProduct.description,
-        id: productId,
-      };
+    try {
       const updatedProduct = await this.productService.updateProduct(
-        updatedData as ProductDocument
+        productId,
+        updatedProductData
       );
 
       if (updatedProduct) {
-        console.log(updatedProduct);
-
         res.status(200).json(updatedProduct);
       } else {
         res.status(500).json({ error: "Failed to update product" });
       }
-    } else {
-      res.status(404).json({ error: "Product not found" });
+    } catch (error) {
+      console.error("Error updating product:", error);
+      res.status(500).json({ error: "Internal Server Error" });
     }
   };
 }

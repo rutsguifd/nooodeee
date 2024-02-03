@@ -32,9 +32,7 @@ class ProductRepository {
     }
     update(product) {
         return __awaiter(this, void 0, void 0, function* () {
-            const updatedProduct = yield product_model_1.default.findByIdAndUpdate(product.id, product, {
-                new: true,
-            }).exec();
+            const updatedProduct = yield product_model_1.default.findByIdAndUpdate(product._id, product, { new: true }).exec();
             return updatedProduct;
         });
     }
