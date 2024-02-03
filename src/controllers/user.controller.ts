@@ -43,30 +43,6 @@ class UserController {
     }
   };
 
-  updateUser: (req: Request, res: Response) => Promise<void> = async (
-    req: Request,
-    res: Response
-  ) => {
-    const userId = req.params.id;
-    const updatedUser = req.body;
-
-    try {
-      const user = await this.userService.updateUser({
-        ...updatedUser,
-        id: userId,
-      });
-
-      if (user) {
-        res.status(200).json(user);
-      } else {
-        res.status(404).json({ error: "User not found" });
-      }
-    } catch (error) {
-      console.error("Error updating user:", error);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  };
-
   softDeleteUser: (req: Request, res: Response) => Promise<void> = async (
     req: Request,
     res: Response
@@ -74,15 +50,15 @@ class UserController {
     const userId = req.params.id;
 
     try {
-      const result = await this.userService.softDeleteUser(userId);
+      const result = await this.userService.deleteUser(userId);
 
       if (result) {
-        res.status(200).json({ message: "User soft-deleted successfully" });
+        res.status(200).json({ message: "User deleted successfully" });
       } else {
         res.status(404).json({ error: "User not found" });
       }
     } catch (error) {
-      console.error("Error soft-deleting user:", error);
+      console.error("Error deleting user:", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
   };

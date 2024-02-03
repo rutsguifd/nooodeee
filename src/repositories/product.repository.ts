@@ -1,10 +1,8 @@
-import ProductModel, {
-  Product,
-  ProductDocument,
-} from "../models/product.model";
+import ProductModel, { ProductDocument } from "../models/product.model";
 
 interface ProductRepositoryInterface {
   findById(id: string): Promise<ProductDocument | null>;
+  findAll(): Promise<ProductDocument[]>;
   create(product: ProductDocument): Promise<ProductDocument>;
   update(product: ProductDocument): Promise<ProductDocument | null>;
   delete(id: string): Promise<boolean>;
@@ -15,7 +13,7 @@ class ProductRepository implements ProductRepositoryInterface {
     return ProductModel.findById(id).exec();
   }
 
-  async findAll(): Promise<Product[]> {
+  async findAll(): Promise<ProductDocument[]> {
     const products = await ProductModel.find().exec();
     return products;
   }
@@ -26,11 +24,9 @@ class ProductRepository implements ProductRepositoryInterface {
 
   async update(product: ProductDocument): Promise<ProductDocument | null> {
     const updatedProduct = await ProductModel.findByIdAndUpdate(
-      product.id,
+      product._id,
       product,
-      {
-        new: true,
-      }
+      { new: true }
     ).exec();
     return updatedProduct;
   }

@@ -1,4 +1,4 @@
-import { Product, ProductDocument } from "../models/product.model";
+import { ProductDocument } from "../models/product.model";
 import ProductRepository from "../repositories/product.repository";
 
 class ProductService {
@@ -8,21 +8,37 @@ class ProductService {
     this.productRepository = new ProductRepository();
   }
 
-  getProductById = async (productId: string): Promise<Product | null> => {
+  getProductById = async (
+    productId: string
+  ): Promise<ProductDocument | null> => {
     return this.productRepository.findById(productId);
   };
 
-  getAllProducts = async (): Promise<Product[]> => {
+  getAllProducts = async (): Promise<ProductDocument[]> => {
     return this.productRepository.findAll();
   };
 
-  createProduct = async (product: ProductDocument): Promise<Product> => {
+  createProduct = async (
+    product: ProductDocument
+  ): Promise<ProductDocument> => {
     return this.productRepository.create(product);
   };
 
-  updateProduct = async (product: ProductDocument): Promise<Product | null> => {
-    const updatedProduct = await this.productRepository.update(product);
-    return updatedProduct;
+  updateProduct = async (
+    productId: string,
+    updatedProductData: Partial<ProductDocument>
+  ): Promise<ProductDocument | null> => {
+    const existingProduct = await this.productRepository.findById(productId);
+
+    if (!existingProduct) {
+      return null;
+    }
+
+    const updatedProduct = {
+      ...existingProduct.toObject(),
+      ...updatedProductData,
+    };
+    return this.productRepository.update(updatedProduct);
   };
 
   deleteProduct = async (productId: string): Promise<boolean> => {

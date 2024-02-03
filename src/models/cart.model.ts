@@ -1,23 +1,24 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { ProductDocument } from "./product.model";
 
-export interface CartItem {
-  productId: string;
-  quantity: number;
-}
-
-export interface Cart {
+export interface CartDocument extends Document {
   userId: string;
+  isDeleted: boolean;
   items: CartItem[];
 }
 
-export interface CartDocument extends Document, Cart {}
+export interface CartItem {
+  productId: Schema.Types.ObjectId;
+  count: number;
+}
 
 const CartSchema: Schema<CartDocument> = new mongoose.Schema({
   userId: { type: String, required: true },
+  isDeleted: { type: Boolean, default: false },
   items: [
     {
-      productId: { type: String, required: true },
-      quantity: { type: Number, required: true },
+      productId: { type: Schema.Types.ObjectId, ref: "Product" },
+      count: Number,
     },
   ],
 });

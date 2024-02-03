@@ -1,4 +1,4 @@
-import { User, UserDocument } from "../models/user.model";
+import { UserDocument } from "../models/user.model";
 import UserRepository from "../repositories/user.repository";
 
 class UserService {
@@ -8,32 +8,15 @@ class UserService {
     this.userRepository = new UserRepository();
   }
 
-  getUserById: (id: string) => Promise<User | null> = (id: string) =>
-    this.userRepository
-      .findById(id)
-      .then((user) => (user ? user.toObject() : null));
+  getUserById: (id: string) => Promise<UserDocument | null> = (id: string) =>
+    this.userRepository.findById(id);
 
-  createUser: (user: UserDocument) => Promise<User> = (user: UserDocument) =>
-    this.userRepository
-      .create(user)
-      .then((createdUser) => createdUser.toObject());
+  createUser: (user: UserDocument) => Promise<UserDocument> = (
+    user: UserDocument
+  ) => this.userRepository.create(user);
 
-  updateUser: (
-    user: UserDocument,
-    cartId?: string | null
-  ) => Promise<User | null> = async (
-    user: UserDocument,
-    cartId?: string | null
-  ) => {
-    if (cartId) {
-      user.cartId = cartId;
-    }
-
-    return this.userRepository.update(user);
-  };
-
-  softDeleteUser: (id: string) => Promise<boolean> = (id: string) =>
-    this.userRepository.softDeleteUser(id);
+  deleteUser: (id: string) => Promise<boolean> = (id: string) =>
+    this.userRepository.deleteUser(id);
 }
 
 export default UserService;
