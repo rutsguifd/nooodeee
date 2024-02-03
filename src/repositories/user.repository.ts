@@ -1,8 +1,7 @@
-import UserModel, { User, UserDocument } from "../models/user.model";
+import UserModel, { UserDocument } from "../models/user.model";
 
 interface UserRepositoryInterface {
   findById(id: string): Promise<UserDocument | null>;
-  findByEmail(email: string): Promise<UserDocument | null>;
   create(user: UserDocument): Promise<UserDocument>;
   deleteUser(id: string): Promise<boolean>;
 }

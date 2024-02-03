@@ -3,14 +3,12 @@ import jwt from "jsonwebtoken";
 
 const JWT_SECRET = "your-secret-key";
 
-// Define the shape of the decoded token
 interface DecodedToken {
   userId: string;
   email: string;
   role: string;
 }
 
-// Extend the Request interface to include a user property
 declare global {
   namespace Express {
     interface Request {
