@@ -5,9 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const user_controller_1 = __importDefault(require("../controllers/user.controller"));
+const auth_middleware_1 = __importDefault(require("../middleware/auth.middleware"));
 const router = express_1.default.Router();
 const userController = new user_controller_1.default();
 router.get("/api/users/:id", userController.getUserById);
 router.post("/api/users", userController.createUser);
-router.delete("/api/users/:id", userController.softDeleteUser);
+router.delete("/api/users/:id", auth_middleware_1.default, userController.softDeleteUser);
+router.post("/api/register", userController.signUp);
+router.post("/api/login", userController.signIn);
 exports.default = router;

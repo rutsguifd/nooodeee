@@ -58,6 +58,38 @@ class UserController {
                 res.status(500).json({ error: "Internal Server Error" });
             }
         });
+        this.signUp = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { email, password, role } = req.body;
+                const tokenOrError = yield this.userService.signUp({
+                    email,
+                    password,
+                    role,
+                });
+                if (typeof tokenOrError === "string") {
+                    res.status(201).json({ token: tokenOrError });
+                }
+                else if (tokenOrError instanceof Error) {
+                    res.status(409).json({ error: tokenOrError.message });
+                }
+                else {
+                    res.status(500).json({ error: "Internal Server Error" });
+                }
+            }
+            catch (error) {
+                console.error("Error signing up user:", error);
+                res.status(500).json({ error: "Internal Server Error" });
+            }
+        });
+        this.signIn = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { email, password } = req.body;
+            const token = yield this.userService.signIn({ email, password });
+            if (!token) {
+                res.status(401).json({ message: "Invalid email or password" });
+                return;
+            }
+            res.status(200).json({ token });
+        });
         this.userService = new user_service_1.default();
     }
 }

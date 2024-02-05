@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { RegisteredUserDocument } from "../models/user.model";
 import UserService from "../services/user.service";
 
 class UserController {
@@ -61,6 +62,39 @@ class UserController {
       console.error("Error deleting user:", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
+  };
+
+  signUp = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { email, password, role } = req.body;
+
+      const tokenOrError = await this.userService.signUp({
+        email,
+        password,
+        role,
+      } as RegisteredUserDocument);
+
+      if (typeof tokenOrError === "string") {
+        res.status(201).json({ token: tokenOrError });
+      } else if (tokenOrError instanceof Error) {
+        res.status(409).json({ error: tokenOrError.message });
+      } else {
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    } catch (error) {
+      console.error("Error signing up user:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  };
+
+  signIn = async (req: Request, res: Response): Promise<void> => {
+    const { email, password } = req.body;
+    const token = await this.userService.signIn({ email, password });
+    if (!token) {
+      res.status(401).json({ message: "Invalid email or password" });
+      return;
+    }
+    res.status(200).json({ token });
   };
 }
 
