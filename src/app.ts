@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import userRoutes from "./routes/user.routes";
 import productRoutes from "./routes/product.routes";
 import cartRoutes from "./routes/cart.routes";
+import healthRoutes from "./routes/health.routes";
 import orderRoutes from "./routes/order.routes";
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
@@ -10,6 +11,7 @@ const swaggerJsDoc = require("swagger-jsdoc");
 dotenv.config();
 
 import "./db/index.db";
+import loggerMiddleware from "./middleware/logger.middleware";
 
 const app = express();
 
@@ -19,7 +21,7 @@ const swaggerOptions = {
     info: {
       title: "Node Task API",
       version: "1.0.0",
-      description: "Here are all routes described",
+      description: "Here are all routes described (Sorry it's depcated)",
     },
     servers: [
       {
@@ -34,7 +36,9 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.use(express.json());
+app.use(loggerMiddleware);
 
+app.use(healthRoutes);
 app.use(userRoutes);
 app.use(productRoutes);
 app.use(cartRoutes);
